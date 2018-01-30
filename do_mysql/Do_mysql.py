@@ -54,6 +54,12 @@ class Do_mysql(object):
             return {'type': 'DATETIME', 'column_name': column_name,
                     'null': null, 'unique': unique, 'default': default}
 
+    ##############################################################
+    ##                                                          ##
+    ##                  内置方法开始..                             ##
+    ##                                                          ##
+    ##############################################################
+
     # 得到字段的所有信息:
     def get_columns(self, columns):
         columns_list = []
@@ -111,13 +117,35 @@ class Do_mysql(object):
     def run_sql(self,sql):
         # 执行sql语句
         try:
+            #执行sql语句
             self.cursor.execute(sql)
+            #返回查询结果
+            result=self.cursor.fetchall()
             # 提交请求
             self.db.commit()
-            return '运行成功'
+            #如果结果的长度为0,则返回运行成功
+            if len(result)==0:
+                result='运行成功'
+            return result
         except Exception as e:
             self.db.rollback()
             raise e
+
+    # 清洗数据,得到正确的传入的值
+    def get_data(self, data_list):
+        # 清洗数据,都转变为字符串类型
+        new_list = []
+        for one_data in data_list:
+            if isinstance(one_data, str):
+                one_data = '"' + one_data + '"'
+            else:
+                one_data = str(one_data)
+
+    ##############################################################
+    ##                                                          ##
+    ##                  表格语句开始..                             ##
+    ##                                                          ##
+    ##############################################################
 
     # 创建数据表的方法:
     def create_table(self, table_name, columns):
@@ -132,6 +160,12 @@ class Do_mysql(object):
             +columns_string+');'
         result=self.run_sql(sql)
         return result
+
+    #查看表格的信息
+    def desc_table(self,table_name):
+        sql='desc '+str(table_name)+';'
+        res=self.run_sql(sql)
+        print(res)
 
     #增加表的字段
     def add_table_column(self,table_name,column_list):
@@ -184,8 +218,30 @@ class Do_mysql(object):
         sql='alter table '+str(table_name)+' change '+new_columns_string+';'
         return self.run_sql(sql)
 
-# alter   table   表格名称   rename   to   新的表格名称;
     #更改表格名字
     def change_table_name(self,old_name,new_name):
         sql='alter table '+str(old_name)+' rename to '+str(new_name)
         return self.run_sql(sql)
+
+    #删除指定表格
+    def delete_table(self,table_name):
+        sql='drop table '+str(table_name)
+        return self.run_sql(sql)
+
+
+    ##############################################################
+    ##                                                          ##
+    ##                  数据语句开始..                             ##
+    ##                                                          ##
+    ##############################################################
+
+    #指定表名,插入所有数据
+    def add_data(self,table_name,data_list):
+        #清洗数据,都转变为字符串类型
+        new_list=[]
+        for one_data in data_list:
+            if isinstance(one_data,str):
+                one_data='"'+one_data+'"'
+            else:
+                one_data=str(one_data)
+

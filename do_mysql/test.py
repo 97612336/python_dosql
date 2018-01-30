@@ -1,15 +1,9 @@
-import pymysql
+import datetime
 
-db=pymysql.connect('localhost','root','root123456','test',charset='utf8')
-cursor=db.cursor()
+time=datetime.datetime.utcnow()
 
-sql='create table haha (haha VARCHAR (20));'
-
-resul=cursor.execute(sql)
-
-print(resul)
-
-db.commit()
-
-cursor.close()
-db.close()
+print(time)
+print(type(time))
+new_time=time.strftime("%Y-%m-%d %H:%M:%S")
+print(new_time)
+print(type(new_time))
