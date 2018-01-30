@@ -1,3 +1,5 @@
+import datetime
+
 import pymysql
 
 
@@ -138,8 +140,14 @@ class Do_mysql(object):
         for one_data in data_list:
             if isinstance(one_data, str):
                 one_data = '"' + one_data + '"'
+            elif isinstance(one_data,datetime.datetime):
+                one_data=one_data.strftime("%Y-%m-%d %H:%M:%S")
+                one_data = '"' + one_data + '"'
             else:
                 one_data = str(one_data)
+            new_list.append(one_data)
+        return new_list
+
 
     ##############################################################
     ##                                                          ##
