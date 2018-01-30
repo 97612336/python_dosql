@@ -100,11 +100,16 @@ class Do_mysql(object):
         #去除总的字段语句中最后一个逗号
         columns_string=columns_string[:-1]
         #写sql语句
-        sql='create table '+str(table_name)+'('+columns_string+');'
+        sql='create table '+str(table_name)+'('+'id BIGINT primary key auto_increment,'+columns_string+');'
+        print(sql)
         #执行sql语句
         try:
             self.cursor.execute(sql)
             #提交请求
             self.db.commit()
-        except:
+            return '创建成功'
+        except Exception as e:
             self.db.rollback()
+            print(e)
+
+    #创建表的方法
