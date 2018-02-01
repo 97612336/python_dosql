@@ -1,5 +1,6 @@
 import datetime
 
+from do_mysql import Column
 from do_mysql.Do_mysql import Do_mysql
 
 dm=Do_mysql('localhost','root','root123456','test',charset='utf8')
@@ -10,9 +11,30 @@ time=dm.create_column.datetime('time',default='')
 new_age=dm.create_column.int('age1')
 new_name=dm.create_column.string('name1',50)
 
-dm.query_by_equal_condition_or('hahu3',[age,name],[1,'小明'])
+res=dm.add_data('hahu3',[age.add_new(123),name.add_new('还是牛逼')])
+print(res)
 
-# res=dm.query_all_data_by_columns('hahu3',[age])
+# res=dm.change_by_condition('hahu3',[age.equal(2)],[name.change_to('真牛逼'),new_name.change_to('123')])
+# print(res)
+
+# age.change_data(123)
+
+# res=dm.delete_by_condition('hahu3',[age.equal(190)])
+# print(res)
+
+# res=dm.query_by_condition('hahu3',[age.big_than(1),age.small_than(190),name.equal('ceshi')])
+# print(res)
+
+# res=dm.query_by_id('hahu3',109)
+# print(res)
+
+# res=age.contain_with('123')
+# print(res)
+
+# res=dm.query_by_equal_condition_or('hahu3',[age,name,name],[1,'小明','ceshi'])
+# print(res)
+
+# res=dm.query_all_data_by_columns('hahu3',[age,name])
 # print(res)
 
 # dm.add_data('hahu3',(18,'lisi','zhangsan'))
@@ -22,7 +44,7 @@ dm.query_by_equal_condition_or('hahu3',[age,name],[1,'小明'])
 # for one in res:
 #     print(one)
 
-# res=dm.add_adta_by_columns('hahu3',(age,name),(2,'牛逼不牛逼?'))
+# res=dm.add_data_by_columns('hahu3', [age, name], [2, '牛逼不牛逼?123'])
 # print(res)
 
 # result=dm.add_data('hahu3',(190,'小明','大名'))

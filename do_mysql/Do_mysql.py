@@ -2,6 +2,8 @@ import datetime
 
 import pymysql
 
+from do_mysql import Column
+
 
 class Do_mysql(object):
     # 在初始化的时候链接数据库,并获取游标对象
@@ -17,44 +19,58 @@ class Do_mysql(object):
         # int类型的字段
         @classmethod
         def int(cls, column_name, null=True, unique=False, default=None):
-            return {'type': 'BIGINT', 'column_name': column_name, 'null': null,
-                    'unique': unique, 'default': default}
+            ctype='BIGINT'
+            return Column(column_name=column_name,ctype=ctype,
+                          null=null,unique=unique,default=default
+                          )
 
         # float类型的字段
         @classmethod
         def float(cls, column_name, null=True, unique=False, default=None):
-            return {'type': 'DOUBLE', 'column_name': column_name, 'null': null,
-                    'unique': unique, 'default': default}
+            ctype = 'DOUBLE'
+            return Column(column_name=column_name,ctype=ctype,
+                          null=null,unique=unique,default=default
+                          )
 
         # string类型的字段
         @classmethod
         def string(cls, column_name, length, null=True, unique=False, default=None):
-            return {'type': 'VARCHAR', 'column_name': column_name, 'length': length,
-                    'null': null, 'unique': unique, 'default': default}
+            ctype = 'VARCHAR'
+            return Column(column_name=column_name,ctype=ctype,
+                          null=null,unique=unique,default=default
+                          )
 
         # 大文本类型
         @classmethod
         def text(cls, column_name, null=True, unique=False, default=None):
-            return {'type': 'TEXT', 'column_name': column_name,
-                    'null': null, 'unique': unique, 'default': default}
+            ctype = 'TEXT'
+            return Column(column_name=column_name,ctype=ctype,
+                          null=null,unique=unique,default=default
+                          )
 
         # 布尔值类型的字段
         @classmethod
         def boolean(cls, column_name, null=True, unique=False, default=None):
-            return {'type': 'BOOLEAN', 'column_name': column_name,
-                    'null': null, 'unique': unique, 'default': default}
+            ctype = 'BOOLEAN'
+            return Column(column_name=column_name,ctype=ctype,
+                          null=null,unique=unique,default=default
+                          )
 
         # 文件类型的字段
         @classmethod
         def file(cls, column_name, null=True, unique=False, default=None):
-            return {'type': 'BOOLEAN', 'column_name': column_name,
-                    'null': null, 'unique': unique, 'default': default}
+            ctype = 'LONGBLOB'
+            return Column(column_name=column_name,ctype=ctype,
+                          null=null,unique=unique,default=default
+                          )
 
         # 时间类型的字段
         @classmethod
         def datetime(cls, column_name, null=True, unique=False, default=None):
-            return {'type': 'DATETIME', 'column_name': column_name,
-                    'null': null, 'unique': unique, 'default': default}
+            ctype = 'DATETIME'
+            return Column(column_name=column_name,ctype=ctype,
+                          null=null,unique=unique,default=default
+                          )
 
     ##############################################################
     ##                                                          ##
@@ -64,36 +80,36 @@ class Do_mysql(object):
 
     # 得到字段的所有信息:
     def get_columns(self, column_list):
-        a=column_list
         if not isinstance(column_list,list):
             raise Exception('传入的字段必须是列表')
         columns_list = []
         # 遍历每一个元素,创建每一个元素
         for one_column in column_list:
+            new_one_column=one_column.go_back()
             # 获得这个元素
-            name = one_column['column_name']
-            ctype = one_column['type']
+            name = new_one_column['column_name']
+            ctype = new_one_column['type']
             # 判断字段是否是null值
-            null = one_column['null']
+            null = new_one_column['null']
             if null:
                 null = ''
             else:
                 null = 'not null'
             # 判断字段是否唯一
-            unique = one_column['unique']
+            unique = new_one_column['unique']
             if unique:
                 unique = 'unique'
             else:
                 unique = ''
             # 判断字段是否有默认值
-            default = one_column['default']
+            default = new_one_column['default']
             if default:
                 default = 'default "' + str(default) + '"'
             else:
                 default = ''
             # 得到字段的长度,如果字段没有长度属性,则把长度属性设为none
             try:
-                length = one_column['length']
+                length = new_one_column['length']
             except:
                 length = None
             # 创建一个字段语句
@@ -160,11 +176,22 @@ class Do_mysql(object):
         if len(column_list)!=len(condition_list):
             raise Exception('字段列表长度要和判断列表长度相同')
         # #把字段列表和条件列表建立一一对应的关系
-        condition_dict={}
+        new_condition_list=[]
         for i in range(0,len(condition_list)):
-            condition_dict[column_names[i]]=condition_list[i]
-        return condition_dict
+            new_list=[]
+            new_list.append(column_names[i])
+            new_list.append(condition_list[i])
+            new_condition_list.append(new_list)
+        return new_condition_list
 
+    def get_conditions_string(self,condition_list):
+        # 遍历每一个条件,然后把条件添加到一个列表中
+        codition_string_list = []
+        for one_codition in condition_list:
+            codition_string_list.append(one_codition)
+        # 根据列表组合成一个新的字符串
+        codition_string = ' and '.join(codition_string_list)
+        return codition_string
 
 
     ##############################################################
@@ -179,8 +206,6 @@ class Do_mysql(object):
         columns_list=self.get_columns(columns)
         #把列表中的每个元素重新组合成新的字符串
         columns_string=','.join(columns_list)
-        #去除总的字段语句中最后一个逗号
-        # columns_string=columns_string[:-1]
         #写sql语句
         sql='create table '+str(table_name)+'('+'id BIGINT primary key auto_increment,' \
             +columns_string+');'
@@ -261,29 +286,26 @@ class Do_mysql(object):
     ##                                                          ##
     ##############################################################
 
+    ####################插入数据开始..###############################
+
     #指定表名,插入所有数据
     def add_data(self,table_name,data_list):
-        #得到数据
-        data_list=self.get_data(data_list)
-        column_string=','.join(data_list)
-        sql='insert into '+str(table_name)+' values(0,'+column_string+');'
-        #执行sql语句:
+        #得到数据字段和数据值
+        columns=[]
+        datas=[]
+        for one_data in data_list:
+            columns.append(one_data[0])
+            datas.append(one_data[1])
+        #组合成新的字符串
+        columns_string=' , '.join(columns)
+        datas_string=' , '.join(datas)
+        #组合成新的sql语句
+        sql = 'insert into ' + str(table_name) + ' (' + columns_string + ') values ('\
+              + datas_string + ');'
         return self.run_sql(sql)
 
-    #根据表明和特定字段名,插入指定数据
-    def add_adta_by_columns(self,table_name,column_list,data_list):
-        #得到字段的所有字段名
-        column_names=self.get_columns_name(column_list)
-        #得到数据
-        data=self.get_data(data_list)
-        # insert
-        # into
-        # 表格名称(字段名称，字段名称)  values(数据，数据);
-        columns=','.join(column_names)
-        datas=','.join(data)
-        sql='insert into '+str(table_name)+' ('+columns+') values ('+datas+');'
-        #执行sql语句
-        return self.run_sql(sql)
+
+    ####################查询数据开始..###############################
 
     #查询表格的所有数据
     def query_all_data(self,table_name):
@@ -296,29 +318,51 @@ class Do_mysql(object):
     def query_all_data_by_columns(self,table_name,column_list):
         #得到所有字段的名字
         columns=self.get_columns_name(column_list)
-        # select
-        # 字段名称, 字段名称
-        # from   表格名称;
-
         #组合成新的字段
         columns_string=','.join(columns)
         sql='select '+columns_string+' from '+str(table_name)
         #执行sql语句
         return self.run_sql(sql)
 
-    #根据指定条件查询
-    def query_by_equal_condition_or(self,table_name,column_list,condition_list):
-        #得到字段名字
-        column_name_list=self.get_columns_name(column_list)
-        #得到条件配对
-        condition_dict=self.get_column_and_condition(column_list,condition_list)
-        # select *
-        # from  表格名称  where
-        # 字段名称 = 数据 and / or 字段名称 = 数据;
+    #根据id查询
+    def query_by_id(self,table_name,id):
+        sql='select * from '+str(table_name)+' where id='+str(id)
+        return self.run_sql(sql)[0]
 
-        #遍历字典,然后组成新的查询条件:
-        for key,value in condition_dict.items():
-            #判断类型,然后省心字符串:
-            # if isinstance()
-            new_string=key+'='+value
+    # 根据指定条件查询
+    def query_by_condition(self,table_name,condition_list):
+        # 得到条件字段
+        codition_string = self.get_conditions_string(condition_list)
+        #拼接sql
+        sql='select * from '+str(table_name)+' where '+str(codition_string)
+        return  self.run_sql(sql)
 
+    ####################删除数据开始..###############################
+
+    #删除表格中的数据
+    def delete_by_condition(self,table_name,condition_list):
+        #得到条件字段
+        codition_string=self.get_conditions_string(condition_list)
+        # 拼接sql
+        sql = 'delete from ' + str(table_name) + ' where ' + str(codition_string)
+        return self.run_sql(sql)
+
+    ####################修改数据开始..###############################
+
+    #修改指定字段
+    def change_by_condition(self,table_name,condition_list,new_data_list):
+        # 得到条件字段
+        codition_string = self.get_conditions_string(condition_list)
+        #sql字段的列表
+        sql_list=[]
+        #遍历新字段的列表,然后得到每个新修改的数据每个字段的sql语句
+        for one in new_data_list:
+            sql='update '+str(table_name)+' set '+one+' where '+codition_string
+            sql_list.append(sql)
+        #遍历sql语句,然后执行
+        for one_sql in sql_list:
+            try:
+                self.run_sql(one_sql)
+            except:
+                return '修改失败'
+        return '修改成功'
