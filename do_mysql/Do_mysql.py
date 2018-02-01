@@ -63,10 +63,13 @@ class Do_mysql(object):
     ##############################################################
 
     # 得到字段的所有信息:
-    def get_columns(self, columns):
+    def get_columns(self, column_list):
+        a=column_list
+        if not isinstance(column_list,list):
+            raise Exception('传入的字段必须是列表')
         columns_list = []
         # 遍历每一个元素,创建每一个元素
-        for one_column in columns:
+        for one_column in column_list:
             # 获得这个元素
             name = one_column['column_name']
             ctype = one_column['type']
@@ -147,6 +150,21 @@ class Do_mysql(object):
                 one_data = str(one_data)
             new_list.append(one_data)
         return new_list
+
+    #清洗单个数据
+
+    #得到字段名字和判断条件的一一对应关系
+    def get_column_and_condition(self,column_list,condition_list):
+        # 得到所有的字段名字
+        column_names = self.get_columns_name(column_list)
+        if len(column_list)!=len(condition_list):
+            raise Exception('字段列表长度要和判断列表长度相同')
+        # #把字段列表和条件列表建立一一对应的关系
+        condition_dict={}
+        for i in range(0,len(condition_list)):
+            condition_dict[column_names[i]]=condition_list[i]
+        return condition_dict
+
 
 
     ##############################################################
@@ -245,11 +263,62 @@ class Do_mysql(object):
 
     #指定表名,插入所有数据
     def add_data(self,table_name,data_list):
-        #清洗数据,都转变为字符串类型
-        new_list=[]
-        for one_data in data_list:
-            if isinstance(one_data,str):
-                one_data='"'+one_data+'"'
-            else:
-                one_data=str(one_data)
+        #得到数据
+        data_list=self.get_data(data_list)
+        column_string=','.join(data_list)
+        sql='insert into '+str(table_name)+' values(0,'+column_string+');'
+        #执行sql语句:
+        return self.run_sql(sql)
+
+    #根据表明和特定字段名,插入指定数据
+    def add_adta_by_columns(self,table_name,column_list,data_list):
+        #得到字段的所有字段名
+        column_names=self.get_columns_name(column_list)
+        #得到数据
+        data=self.get_data(data_list)
+        # insert
+        # into
+        # 表格名称(字段名称，字段名称)  values(数据，数据);
+        columns=','.join(column_names)
+        datas=','.join(data)
+        sql='insert into '+str(table_name)+' ('+columns+') values ('+datas+');'
+        #执行sql语句
+        return self.run_sql(sql)
+
+    #查询表格的所有数据
+    def query_all_data(self,table_name):
+        # select *
+        # from    表格名称;
+        sql='select * from '+str(table_name)
+        return self.run_sql(sql)
+
+    #查询表格执行字段的所有数据
+    def query_all_data_by_columns(self,table_name,column_list):
+        #得到所有字段的名字
+        columns=self.get_columns_name(column_list)
+        # select
+        # 字段名称, 字段名称
+        # from   表格名称;
+
+        #组合成新的字段
+        columns_string=','.join(columns)
+        sql='select '+columns_string+' from '+str(table_name)
+        #执行sql语句
+        return self.run_sql(sql)
+
+    #根据指定条件查询
+    def query_by_equal_condition_or(self,table_name,column_list,condition_list):
+        #得到字段名字
+        column_name_list=self.get_columns_name(column_list)
+        #得到条件配对
+        condition_dict=self.get_column_and_condition(column_list,condition_list)
+        # select *
+        # from  表格名称  where
+        # 字段名称 = 数据 and / or 字段名称 = 数据;
+
+        #遍历字典,然后组成新的查询条件:
+        for key,value in condition_dict.items():
+            #判断类型,然后省心字符串:
+            # if isinstance()
+            new_string=key+'='+value
 
