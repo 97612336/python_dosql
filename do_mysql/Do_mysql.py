@@ -37,7 +37,7 @@ class Do_mysql(object):
         def string(cls, column_name, length, null=True, unique=False, default=None):
             ctype = 'VARCHAR'
             return Column(column_name=column_name,ctype=ctype,
-                          null=null,unique=unique,default=default
+                          null=null,unique=unique,default=default,length=length
                           )
 
         # 大文本类型
@@ -288,7 +288,7 @@ class Do_mysql(object):
 
     ####################插入数据开始..###############################
 
-    #指定表名,插入所有数据
+    #指定表名,插入所有数据,字段方法插入
     def add_data(self,table_name,data_list):
         #得到数据字段和数据值
         columns=[]
@@ -327,7 +327,12 @@ class Do_mysql(object):
     #根据id查询
     def query_by_id(self,table_name,id):
         sql='select * from '+str(table_name)+' where id='+str(id)
-        return self.run_sql(sql)[0]
+        res= self.run_sql(sql)
+        if res=='运行成功':
+            return None
+        else:
+            return res
+
 
     # 根据指定条件查询
     def query_by_condition(self,table_name,condition_list):
@@ -335,7 +340,11 @@ class Do_mysql(object):
         codition_string = self.get_conditions_string(condition_list)
         #拼接sql
         sql='select * from '+str(table_name)+' where '+str(codition_string)
-        return  self.run_sql(sql)
+        res = self.run_sql(sql)
+        if res == '运行成功':
+            return None
+        else:
+            return res
 
     ####################删除数据开始..###############################
 

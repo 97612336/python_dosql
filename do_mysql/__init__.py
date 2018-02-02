@@ -3,12 +3,13 @@ import datetime
 
 class Column(object):
     #实例化时获取传入的参数
-    def __init__(self, column_name,ctype, null=True, unique=False, default=None):
+    def __init__(self, column_name,ctype, null, unique, default,length=None):
         self.column_name=column_name
         self.ctype=ctype
         self.null=null
         self.unique=unique
         self.default=default
+        self.length=length
         self.id=''
 
     #返回的返回值
@@ -117,3 +118,73 @@ class Column(object):
         new_data_list.append(column_name)
         new_data_list.append(new_data)
         return new_data_list
+
+    #更改字段名称:
+    # def change_column(self, data):
+    #     new_column_name=data
+    #     column_name=self.column_name
+    #     ctype=self.ctype
+    #     null=self.null
+    #     unique=self.unique
+    #     default=self.default
+    #     length=self.length
+    #     if null:
+    #         null = ''
+    #     else:
+    #         null = 'not null'
+    #     # 判断字段是否唯一
+    #     if unique:
+    #         unique = 'unique'
+    #     else:
+    #         unique = ''
+    #     # 判断字段是否有默认值
+    #     if default:
+    #         default = 'default "' + str(default) + '"'
+    #     else:
+    #         default = ''
+    #     # 得到字段的长度,如果字段没有长度属性,则把长度属性设为none
+    #     if length:
+    #         length=str(length)
+    #     else:
+    #         length=''
+    #     # 创建一个字段语句
+    #     if ctype == 'VARCHAR':
+    #         one_column_string = str(column_name) + ' ' +str(new_column_name)+' '+str(ctype) \
+    #                             + '(' + str(length) + ') ' + ' ' + default + null + ' ' + unique
+    #     else:
+    #         one_column_string = str(column_name) + ' '+str(new_column_name)+' ' + str(ctype) \
+    #                             + ' '+ default + null + ' ' + unique
+    #     return one_column_string
+
+    #更改表格的字段类型
+    # def change_column_type(self,ctype,length=None, null=True, unique=False, default=None):
+    #     column_name=self.column_name
+    #     if null:
+    #         null = ''
+    #     else:
+    #         null = 'not null'
+    #     # 判断字段是否唯一
+    #     if unique:
+    #         unique = 'unique'
+    #     else:
+    #         unique = ''
+    #     # 判断字段是否有默认值
+    #     if default:
+    #         default = 'default "' + str(default) + '"'
+    #     else:
+    #         default = ''
+    #     # 得到字段的长度,如果字段没有长度属性,则把长度属性设为none
+    #     if length:
+    #         length=str(length)
+    #     else:
+    #         length=''
+    #     # 创建一个字段语句
+    #     if ctype == 'VARCHAR':
+    #         one_column_string = str(column_name) +' '+str(ctype) \
+    #                             + '(' + str(length) + ') ' + ' ' + \
+    #                             default + null + ' ' + unique
+    #     else:
+    #         one_column_string = str(column_name)+' ' + str(ctype) \
+    #                             + ' '+ default + null + ' ' + unique
+    #     print(one_column_string)
+    #     return one_column_string

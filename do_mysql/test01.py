@@ -1,18 +1,37 @@
 import datetime
 
+# 得到所有字段信息,并组合成一个新的字符串
+#         new_string=',change '.join(new_column_list)
+#         sql='alter table '+str(table_name)+' change '+new_string
+#         return self.run_sql(sql)
+
 from do_mysql import Column
 from do_mysql.Do_mysql import Do_mysql
 
 dm=Do_mysql('localhost','root','root123456','test',charset='utf8')
 
-age=dm.create_column.int('age3')
-name=dm.create_column.string('name3',20)
+age=dm.create_column.int('age123')
+name=dm.create_column.string('name123',20)
 time=dm.create_column.datetime('time',default='')
-new_age=dm.create_column.int('age1')
+new_age=dm.create_column.int('age123')
 new_name=dm.create_column.string('name1',50)
 
-res=dm.add_data('hahu3',[age.add_new(123),name.add_new('还是牛逼')])
-print(res)
+# age.change_column_type([age])
+
+# res=dm.change_table_column_name('hahu3',[age],[new_age])
+# print(res)
+
+# age.change_column_name('age')
+# name.change_column_name('name')
+
+# res=dm.change_table_column_name('hahu3', [age.change_column('age12'), name.change_column('name123')])
+# print(res)
+
+# res=dm.add_data('hahu3',[age.add_new(123),name.add_new('还是牛逼')])
+# print(res)
+
+# res=dm.change_table_column_name('hahu3',[age],['age'])
+# print(res)
 
 # res=dm.change_by_condition('hahu3',[age.equal(2)],[name.change_to('真牛逼'),new_name.change_to('123')])
 # print(res)
@@ -22,11 +41,11 @@ print(res)
 # res=dm.delete_by_condition('hahu3',[age.equal(190)])
 # print(res)
 
-# res=dm.query_by_condition('hahu3',[age.big_than(1),age.small_than(190),name.equal('ceshi')])
-# print(res)
+res=dm.query_by_condition('hahu3',[age.big_than(1),age.small_than(190)])
+print(res)
 
-# res=dm.query_by_id('hahu3',109)
-# print(res)
+res=dm.query_by_id('hahu3',1)
+print(res)
 
 # res=age.contain_with('123')
 # print(res)
